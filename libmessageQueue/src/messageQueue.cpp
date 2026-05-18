@@ -43,7 +43,7 @@ namespace MAX_Message {
             /// 不同的模式下消息队列处理模式不同
             Error_Code ret = OK;
             while(1){
-                if (size() >= maxMessageSize) {
+                if (maxMessageSize >= 0 && size() > maxMessageSize) {
 
                     if(timeoutMillis == WAIT_FOREVER){
 
