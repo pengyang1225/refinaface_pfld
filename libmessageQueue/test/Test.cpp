@@ -123,6 +123,19 @@ void testDataMsg()
     TEST_EQUALS(dm.getPayload(), std::string("foobar"));
 }
 
+void testBoundedQueueRejectsOverflow()
+{
+    MAX_Message::Queue q;
+    q.setAttribute(1);
+
+    TEST_EQUALS(q.put(MAX_Message::Msg(1), MAX_Message::NO_WAIT, MAX_Message::MESSAGE_PRI_NORMAL), MAX_Message::OK);
+    TEST_EQUALS(q.put(MAX_Message::Msg(2), MAX_Message::NO_WAIT, MAX_Message::MESSAGE_PRI_NORMAL), MAX_Message::CAN_NOT_INSERT_MESSAGE);
+    TEST_EQUALS(q.size(), static_cast<size_t>(1));
+
+    auto m = q.get(MAX_Message::NO_WAIT);
+    TEST_EQUALS(m->getMsgId(), 1);
+}
+
 // Test putting DataMsg through the queue
 void testMatMsg()
 {
@@ -298,6 +311,7 @@ int main()
     tester.addTest(testMsgOrder, "Test 1-to-1 message order");
     tester.addTest(test2To1MsgOrder, "Test 2-to-1 message order");
     tester.addTest(testDataMsg, "Test DataMsg");
+    tester.addTest(testBoundedQueueRejectsOverflow, "Test bounded queue overflow");
     tester.addTest(testMatMsg, "Test MatMsg");
     tester.addTest(testReceiveTimeout, "Test receive timeout");
     tester.addTest(testRequestResponse, "Test 2-to-1 request-response");
